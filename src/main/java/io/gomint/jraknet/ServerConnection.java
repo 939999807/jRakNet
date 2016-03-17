@@ -156,9 +156,6 @@ class ServerConnection extends Connection {
 			return;
 		}
 
-		// Do this before sending the response:
-		this.initializeStructures();
-
 		this.sendConnectionReply2();
 		this.setState( ConnectionState.RELIABLE );
 	}

@@ -180,6 +180,26 @@ public class ServerSocket extends Socket {
 	 */
 	@Override
 	protected void handleDatagram( DatagramBuffer datagram, long time ) {
+        if ( datagram.length() > 8000 ) {
+            StringBuilder stringBuilder = new StringBuilder();
+            int columnSize = 0;
+            for ( byte b : datagram.getData() ) {
+                String hex = Integer.toHexString( b & 255 );
+                if ( hex.length() == 1 ) {
+                    hex = "0" + hex;
+                }
+
+                stringBuilder.append( hex ).append( " " );
+
+                columnSize++;
+                if ( columnSize == 16 ) {
+                    columnSize = 0;
+                    stringBuilder.append( "\n" );
+                }
+            }
+            System.out.println( stringBuilder.toString() );
+        }
+
 		this.getConnection( datagram.address() ).handleDatagram( datagram, time );
 	}
 

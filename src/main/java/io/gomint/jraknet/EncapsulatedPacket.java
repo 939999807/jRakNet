@@ -69,9 +69,14 @@ public class EncapsulatedPacket {
 
 		// Decode the packet:
 		byte flags = buffer.readByte();
+        System.out.println( "Encapsulated Flag: " + Integer.toHexString( flags & 255 ) );
+
 		this.reliability = PacketReliability.getFromId( (byte) ( ( flags & 0xE0 ) >>> 5 ) );
 		boolean isSplitPacket = ( flags & 0x10 ) != 0;
 		int packetLength = ( buffer.readUShort() + 7 ) >> 3;
+        System.out.println( "Encapsulated packet length: " + packetLength );
+        System.out.println( "Read " + buffer.getPosition() + " bytes so far [after packet header]" );
+
 		this.reliableMessageNumber = -1;
 		this.sequencingIndex = -1;
 		this.orderingIndex = -1;

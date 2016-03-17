@@ -87,6 +87,7 @@ public abstract class Connection {
 		this.address = address;
 		this.state = initialState;
 		this.reset();
+        this.initializeStructures();
 	}
 
 	// ================================ PUBLIC API ================================ //
@@ -455,7 +456,7 @@ public abstract class Connection {
 
 
 	protected final void setMtuSize( int mtuSize ) {
-		this.mtuSize = mtuSize;
+        this.mtuSize = mtuSize;
 	}
 
 	protected final void setGuid( long guid ) {
@@ -867,7 +868,7 @@ public abstract class Connection {
 
 	// ================================ PACKET HANDLERS ================================ //
 
-	private void handleConnectedDatagram( DatagramBuffer datagram ) {
+	public void handleConnectedDatagram( DatagramBuffer datagram ) {
 		if ( !this.state.isReliable() ) {
 			// This connection is not reliable --> internal structures might not have been initialized
 			return;
@@ -921,8 +922,14 @@ public abstract class Connection {
 		// ACK this datagram:
 		this.outgoingACKs.insert( datagramSequenceNumber );
 
+        System.out.println( "Read " + buffer.getPosition() + " bytes so far" );
+        System.out.println( "Next byte after reading RakNet Header is: " + Integer.toHexString( buffer.getBuffer()[buffer.getPosition()] & 255 ) );
+
 		EncapsulatedPacket packet = new EncapsulatedPacket();
 		while ( buffer.getPosition() - buffer.getBufferOffset() < datagram.length() && packet.readFromBuffer( buffer ) ) {
+            System.out.println( "Read " + buffer.getPosition() + " bytes so far" );
+            System.out.println( "Next byte after reading Encapsulated packet is: " + Integer.toHexString( buffer.getBuffer()[buffer.getPosition()] & 255 ) );
+
 			if ( packet.isSplitPacket() ) {
 				packet = this.rebuildSplitPacket( packet );
 				if ( packet == null ) {
